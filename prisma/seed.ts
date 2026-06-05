@@ -57,13 +57,13 @@ async function main() {
   await (prisma as any).stock.upsert({
     where: { productId_warehouseId: { productId: p1.id, warehouseId: wh1.id } },
     update: {},
-    create: { productId: p1.id, warehouseId: wh1.id, quantity: 150 },
+    create: { productId: p1.id, warehouseId: wh1.id, quantity: 150, userId: admin.id },
   })
 
   await (prisma as any).stock.upsert({
     where: { productId_warehouseId: { productId: p2.id, warehouseId: wh1.id } },
     update: {},
-    create: { productId: p2.id, warehouseId: wh1.id, quantity: 200 },
+    create: { productId: p2.id, warehouseId: wh1.id, quantity: 200, userId: admin.id },
   })
 
   // Create some orders

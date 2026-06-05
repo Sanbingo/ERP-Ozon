@@ -18,6 +18,7 @@ model User {
   stores    Store[]
   warehouses Warehouse[]
   products   Product[]
+  stocks     Stock[]
   orders     Order[]
   purchaseOrders PurchaseOrder[]
   createdAt DateTime @default(now())
@@ -69,6 +70,8 @@ model Stock {
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
   quantity    Int       @default(0)
   reserved    Int       @default(0) // FBS reserved
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id])
   updatedAt   DateTime  @updatedAt
 
   @@unique([productId, warehouseId])
