@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Warehouse as WarehouseIcon, MapPin, Package, Plus } from "lucide-react";
 import WarehouseCreateModal from "./WarehouseCreateModal";
+import StockTransferModal from "./StockTransferModal";
 
 interface WarehousesClientProps {
   warehouses: any[];
@@ -10,6 +11,13 @@ interface WarehousesClientProps {
 
 export default function WarehousesClient({ warehouses }: WarehousesClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | undefined>();
+
+  const handleTransfer = (warehouseId: string) => {
+    setSelectedWarehouseId(warehouseId);
+    setIsTransferOpen(true);
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -78,10 +86,16 @@ export default function WarehousesClient({ warehouses }: WarehousesClientProps) 
             </div>
 
             <div className="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3">
-              <button className="text-xs font-bold text-gray-400 hover:text-primary transition-colors">
+              <button 
+                onClick={() => alert("仓库详情设置功能开发中...")}
+                className="text-xs font-bold text-gray-400 hover:text-primary transition-colors"
+              >
                 仓库设置
               </button>
-              <button className="text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all">
+              <button 
+                onClick={() => handleTransfer(wh.id)}
+                className="text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all"
+              >
                 库存调拨
               </button>
             </div>
@@ -102,6 +116,13 @@ export default function WarehousesClient({ warehouses }: WarehousesClientProps) 
       <WarehouseCreateModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+      />
+
+      <StockTransferModal 
+        isOpen={isTransferOpen}
+        onClose={() => setIsTransferOpen(false)}
+        warehouses={warehouses}
+        initialFromWarehouseId={selectedWarehouseId}
       />
     </div>
   );
