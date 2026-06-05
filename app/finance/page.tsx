@@ -1,23 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { CircleDollarSign, TrendingUp, TrendingDown, PieChart as PieChartIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getFinanceStats() {
-  const products = await prisma.product.findMany({
+  const where = await getAuthWhereClause() as any;
+  const products = await (prisma as any).product.findMany({
+    where,
     include: { stocks: true }
   });
 
-  const inventoryValue = products.reduce((acc, p) => {
-    const totalStock = p.stocks.reduce((sum, s) => sum + s.quantity, 0);
+  const inventoryValue = products.reduce((acc: number, p: any) => {
+    const totalStock = p.stocks.reduce((sum: number, s: any) => sum + s.quantity, 0);
     return acc + (totalStock * p.cost);
   }, 0);
 
-  const totalSales = await prisma.order.aggregate({
+  const totalSales = await (prisma as any).order.aggregate({
+    where,
     _sum: { totalAmount: true }
   });
 
-  const orders = await prisma.order.findMany();
-  const shippedOrders = orders.filter(o => o.status === 'SHIPPED').length;
+  const orders = await (prisma as any).order.findMany({ where });
+  const shippedOrders = orders.filter((o: any) => o.status === 'SHIPPED').length;
 
   return {
     inventoryValue,

@@ -10,20 +10,26 @@ import {
   ArrowDownRight
 } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getStats() {
-  const totalProducts = await prisma.product.count();
-  const totalOrders = await prisma.order.count();
-  const lowStockProducts = await prisma.stock.count({
-    where: { quantity: { lt: 10 } }
+  const where = await getAuthWhereClause() as any;
+  const totalProducts = await (prisma as any).product.count({ where });
+  const totalOrders = await (prisma as any).order.count({ where });
+  const lowStockProducts = await (prisma as any).stock.count({
+    where: { 
+      ...where,
+      quantity: { lt: 10 } 
+    }
   });
-  const warehouses = await prisma.warehouse.findMany({
+  const warehouses = await (prisma as any).warehouse.findMany({
+    where,
     include: {
       stocks: true
     }
   });
 
-  const totalValue = await prisma.product.findMany().then(products => 
+  const totalValue = await (prisma as any).product.findMany({ where }).then((products: any[]) => 
     products.reduce((acc, p) => acc + (p.cost * 100), 0)
   );
 
@@ -125,7 +131,7 @@ export default async function Dashboard() {
             <button className="text-xs text-primary font-medium hover:underline">查看全部</button>
           </div>
           <div className="space-y-4">
-            {stats.warehouses.map((wh) => (
+            {stats.warehouses.map((wh: any) => (
               <div key={wh.id} className="p-4 rounded-xl border border-gray-50 bg-gray-50/50 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-center">
                   <div>
@@ -134,7 +140,7 @@ export default async function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-primary">
-                      {wh.stocks.reduce((acc, s) => acc + s.quantity, 0)}
+                      {wh.stocks.reduce((acc: number, s: any) => acc + s.quantity, 0)}
                     </p>
                     <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total SKU</p>
                   </div>
@@ -142,7 +148,7 @@ export default async function Dashboard() {
                 <div className="mt-3 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                   <div 
                     className="bg-primary h-full rounded-full" 
-                    style={{ width: `${Math.min(100, (wh.stocks.reduce((acc, s) => acc + s.quantity, 0) / 500) * 100)}%` }} 
+                    style={{ width: `${Math.min(100, (wh.stocks.reduce((acc: number, s: any) => acc + s.quantity, 0) / 500) * 100)}%` }} 
                   />
                 </div>
               </div>

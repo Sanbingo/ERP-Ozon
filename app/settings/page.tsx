@@ -12,10 +12,14 @@ import {
   MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getData() {
-  const stores = await (prisma as any).store.findMany();
-  const configs = await (prisma as any).systemConfig.findMany();
+  const where = await getAuthWhereClause() as any;
+  const stores = await (prisma as any).store.findMany({ where });
+  const configs = await (prisma as any).systemConfig.findMany(); // Global configs usually don't filter by user, or filter by user? Let's keep global for now but store user-specific if needed. 
+  
+  // Actually, stores are definitely user-specific. 
   
   // Group configs by group name
   const groupedConfigs = configs.reduce((acc: Record<string, any[]>, config: any) => {

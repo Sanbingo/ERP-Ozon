@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { Warehouse as WarehouseIcon, MapPin, Package } from "lucide-react";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getWarehouses() {
-  return await prisma.warehouse.findMany({
+  const where = await getAuthWhereClause() as any;
+  return await (prisma as any).warehouse.findMany({
+    where,
     include: {
       _count: {
         select: { stocks: true }

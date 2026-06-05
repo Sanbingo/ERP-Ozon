@@ -2,21 +2,32 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Create Warehouses
-  const wh1 = await prisma.warehouse.upsert({
-    where: { name: '深圳主仓' },
+  // Create Admin User
+  const admin = await (prisma as any).user.upsert({
+    where: { phone: '13800138000' },
     update: {},
-    create: { name: '深圳主仓', location: '深圳' },
+    create: {
+      phone: '13800138000',
+      name: '超级管理员',
+      role: 'ADMIN',
+    },
   })
 
-  const wh2 = await prisma.warehouse.upsert({
+  // Create Warehouses
+  const wh1 = await (prisma as any).warehouse.upsert({
+    where: { name: '深圳主仓' },
+    update: {},
+    create: { name: '深圳主仓', location: '深圳', userId: admin.id },
+  })
+
+  const wh2 = await (prisma as any).warehouse.upsert({
     where: { name: '莫斯科海外仓' },
     update: {},
-    create: { name: '莫斯科海外仓', location: '俄罗斯' },
+    create: { name: '莫斯科海外仓', location: '俄罗斯', userId: admin.id },
   })
 
   // Create Products
-  const p1 = await prisma.product.upsert({
+  const p1 = await (prisma as any).product.upsert({
     where: { sku: 'OZ-001' },
     update: {},
     create: {
@@ -25,10 +36,11 @@ async function main() {
       cost: 45.0,
       price: 1599,
       category: '家居',
+      userId: admin.id,
     },
   })
 
-  const p2 = await prisma.product.upsert({
+  const p2 = await (prisma as any).product.upsert({
     where: { sku: 'WB-002' },
     update: {},
     create: {
@@ -37,24 +49,25 @@ async function main() {
       cost: 88.0,
       price: 2499,
       category: '数码',
+      userId: admin.id,
     },
   })
 
   // Create Stocks
-  await prisma.stock.upsert({
+  await (prisma as any).stock.upsert({
     where: { productId_warehouseId: { productId: p1.id, warehouseId: wh1.id } },
     update: {},
     create: { productId: p1.id, warehouseId: wh1.id, quantity: 150 },
   })
 
-  await prisma.stock.upsert({
+  await (prisma as any).stock.upsert({
     where: { productId_warehouseId: { productId: p2.id, warehouseId: wh1.id } },
     update: {},
     create: { productId: p2.id, warehouseId: wh1.id, quantity: 200 },
   })
 
   // Create some orders
-  await prisma.order.upsert({
+  await (prisma as any).order.upsert({
     where: { platformOrderId: 'OZ-ORDER-1001' },
     update: {},
     create: {
@@ -63,6 +76,7 @@ async function main() {
       status: 'PENDING',
       totalAmount: 1599,
       warehouseId: wh1.id,
+      userId: admin.id,
       items: {
         create: {
           productId: p1.id,
@@ -83,38 +97,7 @@ async function main() {
       platform: 'Ozon',
       apiKey: 'ozon-api-key-example-123456',
       clientId: '887766',
-    }
-  })
-
-  await (prisma as any).store.upsert({
-    where: { id: 'store-2' },
-    update: {},
-    create: {
-      id: 'store-2',
-      name: 'WB 俄罗斯二店',
-      platform: 'Wildberries',
-      apiKey: 'wb-token-example-789012',
-    }
-  })
-
-  // Create Configs
-  await (prisma as any).systemConfig.upsert({
-    where: { key: 'low_stock_threshold' },
-    update: {},
-    create: {
-      key: 'low_stock_threshold',
-      value: '20',
-      group: 'INVENTORY',
-    }
-  })
-
-  await (prisma as any).systemConfig.upsert({
-    where: { key: 'feishu_webhook' },
-    update: {},
-    create: {
-      key: 'feishu_webhook',
-      value: 'https://open.feishu.cn/open-apis/bot/v2/hook/example',
-      group: 'NOTIFICATION',
+      userId: admin.id,
     }
   })
 

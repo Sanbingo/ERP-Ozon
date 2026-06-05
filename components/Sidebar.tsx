@@ -12,9 +12,11 @@ import {
   PackageSearch,
   CircleDollarSign,
   ChevronRight,
-  User
+  User,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "仪表盘概览", href: "/" },
@@ -34,6 +36,9 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  if (!session) return null;
 
   return (
     <div className="w-64 bg-white border-r flex flex-col h-screen sticky top-0">
@@ -73,16 +78,27 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t bg-gray-50/50">
-        <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group">
+      <div className="p-4 border-t bg-gray-50/50 space-y-2">
+        <div className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors group">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
             <User className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-semibold text-gray-900 truncate">系统管理员</p>
-            <p className="text-xs text-gray-500 truncate">admin@erp.com</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{session.user?.name || "未知用户"}</p>
+            <p className="text-[10px] text-gray-500 truncate">{(session.user as any)?.phone}</p>
           </div>
+          {(session.user as any)?.role === 'ADMIN' && (
+            <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[8px] font-bold rounded">ADMIN</span>
+          )}
         </div>
+        
+        <button 
+          onClick={() => signOut()}
+          className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all group"
+        >
+          <LogOut className="w-5 h-5 text-gray-400 group-hover:text-red-500" />
+          <span>退出登录</span>
+        </button>
       </div>
     </div>
   );

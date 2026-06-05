@@ -2,9 +2,12 @@ import { prisma } from "@/lib/prisma";
 import { Truck, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getOrders() {
-  return await prisma.order.findMany({
+  const where = await getAuthWhereClause() as any;
+  return await (prisma as any).order.findMany({
+    where,
     include: {
       items: {
         include: {

@@ -10,6 +10,28 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model User {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String?
+  role      String   @default("USER") // "USER", "ADMIN"
+  stores    Store[]
+  warehouses Warehouse[]
+  products   Product[]
+  orders     Order[]
+  purchaseOrders PurchaseOrder[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model Product {
   id          String   @id @default(cuid())
   sku         String   @unique
@@ -21,6 +43,8 @@ model Product {
   stocks      Stock[]
   purchaseOrders PurchaseOrderItem[]
   orderItems  OrderItem[]
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -31,6 +55,8 @@ model Warehouse {
   location  String?
   stocks    Stock[]
   orders    Order[]
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -58,6 +84,8 @@ model Order {
   warehouse       Warehouse?  @relation(fields: [warehouseId], references: [id])
   items           OrderItem[]
   totalAmount     Float
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
@@ -76,9 +104,11 @@ model PurchaseOrder {
   id          String              @id @default(cuid())
   orderNumber String              @unique // 1688 order number
   supplier    String              @default("1688 Supplier")
-  status      String              // "PENDING", "COMPLETED"
+  status          String              // "PENDING", "COMPLETED"
   items       PurchaseOrderItem[]
   totalCost   Float
+  userId      String?
+  user            User?               @relation(fields: [userId], references: [id])
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
 }
@@ -109,6 +139,8 @@ model Store {
   apiKey    String
   clientId  String?
   status    String   @default("ACTIVE") // "ACTIVE", "INACTIVE"
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

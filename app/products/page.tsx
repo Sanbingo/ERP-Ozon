@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { Package, Search, Plus, Filter, MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getProducts() {
-  return await prisma.product.findMany({
+  const where = await getAuthWhereClause() as any;
+  return await (prisma as any).product.findMany({
+    where,
     include: {
       stocks: {
         include: {

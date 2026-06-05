@@ -1,16 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { ShoppingBag, ArrowUpRight, TrendingDown, CheckCircle2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { getAuthWhereClause } from "@/lib/auth";
 
 async function getReplenishmentData() {
-  const products = await prisma.product.findMany({
+  const where = await getAuthWhereClause() as any;
+  const products = await (prisma as any).product.findMany({
+    where,
     include: {
       stocks: true,
     }
   });
 
-  return products.map(p => {
-    const totalStock = p.stocks.reduce((acc, s) => acc + s.quantity, 0);
+  return products.map((p: any) => {
+    const totalStock = p.stocks.reduce((acc: number, s: any) => acc + s.quantity, 0);
     const suggested = Math.max(0, 100 - totalStock); // Simple logic: maintain 100 units
     return {
       ...p,
@@ -18,7 +21,7 @@ async function getReplenishmentData() {
       suggested,
       priority: suggested > 50 ? 'HIGH' : suggested > 0 ? 'MEDIUM' : 'LOW'
     };
-  }).filter(p => p.suggested > 0);
+  }).filter((p: any) => p.suggested > 0);
 }
 
 export default async function PurchasePage() {
