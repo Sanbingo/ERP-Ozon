@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .erp-card {
+    @apply bg-white rounded-xl border border-gray-100 shadow-erp transition-all duration-200 hover:shadow-erp-hover;
+  }
+  
+  .erp-button-primary {
+    @apply bg-primary text-white px-4 py-2 rounded-lg font-medium transition-all hover:bg-primary-600 active:scale-95 disabled:opacity-50;
+  }
+  
+  .erp-button-secondary {
+    @apply bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-all hover:bg-gray-50 active:scale-95;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400;
+}

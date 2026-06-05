@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  sku         String   @unique
+  name        String
+  image       String?
+  cost        Float    @default(0)
+  price       Float    @default(0)
+  category    String?
+  stocks      Stock[]
+  purchaseOrders PurchaseOrderItem[]
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  location  String?
+  stocks    Stock[]
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stock {
+  id          String    @id @default(cuid())
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  quantity    Int       @default(0)
+  reserved    Int       @default(0) // FBS reserved
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([productId, warehouseId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  platform        String      // "Ozon" or "Wildberries"
+  platformOrderId String      @unique
+  status          String      // "PENDING", "SHIPPED", "CANCELLED"
+  fbsMode         Boolean     @default(true)
+  warehouseId     String?
+  warehouse       Warehouse?  @relation(fields: [warehouseId], references: [id])
+  items           OrderItem[]
+  totalAmount     Float
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+model PurchaseOrder {
+  id          String              @id @default(cuid())
+  orderNumber String              @unique // 1688 order number
+  supplier    String              @default("1688 Supplier")
+  status      String              // "PENDING", "COMPLETED"
+  items       PurchaseOrderItem[]
+  totalCost   Float
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id])
+  quantity        Int
+  cost            Float
+}
+
+model FinancialRecord {
+  id          String   @id @default(cuid())
+  type        String   // "INCOME", "EXPENSE"
+  amount      Float
+  description String
+  category    String   // "SALES", "PURCHASE", "LOGISTICS", "OTHER"
+  createdAt   DateTime @default(now())
+}
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  platform  String   // "Ozon", "Wildberries"
+  apiKey    String
+  clientId  String?
+  status    String   @default("ACTIVE") // "ACTIVE", "INACTIVE"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique // "low_stock_threshold", "feishu_webhook", etc.
+  value     String
+  group     String   // "INVENTORY", "NOTIFICATION", "FINANCE"
+  updatedAt DateTime @updatedAt
+}
