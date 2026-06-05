@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Loader2, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -9,15 +9,25 @@ interface StoreAuthModalProps {
   onClose: () => void;
 }
 
+const initialFormState = {
+  name: "",
+  platform: "Ozon",
+  apiKey: "",
+  clientId: "",
+};
+
 export default function StoreAuthModal({ isOpen, onClose }: StoreAuthModalProps) {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    platform: "Ozon",
-    apiKey: "",
-    clientId: "",
-  });
+  const [formData, setFormData] = useState(initialFormState);
   const router = useRouter();
+
+  // Reset form data when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(initialFormState);
+      setLoading(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
