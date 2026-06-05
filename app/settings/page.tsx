@@ -135,7 +135,7 @@ export default async function SettingsPage() {
                 <div className="relative group">
                   <input 
                     type="number" 
-                    defaultValue="20"
+                    defaultValue={groupedConfigs.INVENTORY?.find((c: any) => c.key === 'low_stock_threshold')?.value || "20"}
                     className="w-full bg-gray-50 border-none rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 transition-all font-bold text-gray-900"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold uppercase">Units</span>
@@ -148,7 +148,7 @@ export default async function SettingsPage() {
                 <div className="relative group">
                   <input 
                     type="number" 
-                    defaultValue="15"
+                    defaultValue={groupedConfigs.INVENTORY?.find((c: any) => c.key === 'replenishment_cycle')?.value || "15"}
                     className="w-full bg-gray-50 border-none rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 transition-all font-bold text-gray-900"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold uppercase">Days</span>
@@ -184,6 +184,7 @@ export default async function SettingsPage() {
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">飞书 Webhook 地址</label>
                 <textarea 
                   rows={3}
+                  defaultValue={groupedConfigs.NOTIFICATION?.find((c: any) => c.key === 'feishu_webhook')?.value || ""}
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
                   className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 transition-all text-xs font-mono"
                 />
