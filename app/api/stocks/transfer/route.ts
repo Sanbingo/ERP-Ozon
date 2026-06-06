@@ -57,7 +57,27 @@ export async function POST(req: Request) {
         },
       });
 
-      // 4. Create financial record or log if needed (optional)
+      // 4. Create inventory logs
+      await tx.inventoryLog.createMany({
+        data: [
+          {
+            type: "OUT",
+            productId,
+            warehouseId: fromWarehouseId,
+            quantity,
+            reason: `TRANSFER_TO_${toWarehouseId}`,
+            userId: user.id,
+          },
+          {
+            type: "IN",
+            productId,
+            warehouseId: toWarehouseId,
+            quantity,
+            reason: `TRANSFER_FROM_${fromWarehouseId}`,
+            userId: user.id,
+          }
+        ]
+      });
     });
 
     return NextResponse.json({ message: "调拨成功" });

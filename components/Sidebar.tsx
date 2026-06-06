@@ -23,6 +23,7 @@ const menuItems = [
   { group: "核心业务", items: [
     { icon: PackageSearch, label: "产品库管理", href: "/products" },
     { icon: Warehouse, label: "多仓库管理", href: "/warehouses" },
+    { icon: BarChart3, label: "库存流水", href: "/inventory/logs" },
     { icon: ShoppingCart, label: "智能采购", href: "/purchase" },
     { icon: Truck, label: "FBS 订单处理", href: "/orders" },
   ]},
